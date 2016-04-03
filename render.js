@@ -1,21 +1,38 @@
 var apiRoot = "http://localhost:8000"
-var	authToken = ""
 
-$.ajax({
-	method: "POST",
-	url: apiRoot + "/obtain-auth-token/",
-	data: { username: "Brachamul", password: "purple14" }
+var App = React.createClass({
+	authenticate: function() {
+		$.ajax({
+			method: "POST",
+			url: apiRoot + this.props.authURL,
+			data: { username: "Brachamul", password: "purple14" },
+			success: function(data) {
+				this.props.authToken = "Token " + response.token
+				console.log(this.props.authToken)
+			},
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			},
+		})
+	},
+	render: function(){
+		return(
+			<div id="app">
+				<div id="projet" className="tabContent" >
+					<User authToken={this.props.authToken} currentUser={true} pollInterval={2000} />
+					<Board title="Débats en cours" url={apiRoot + "/propositions/"} pollInterval={2000} />
+				</div>
+				<div id="compass" className="tabContent"></div>
+				<div id="trending" className="tabContent"></div>
+			</div>
+		)
+	},
 })
-	.done(function( response ) {
-		authToken = "Token " + response.token
-		console.log(authToken)
- 	});
-
 
 var Board = React.createClass({
 	loadCardsFromServer: function() {
 		$.ajax({
-			url: apiRoot + this.props.url,
+			url: this.props.url,
 			dataType: 'json',
 			cache: false,
 			mimetype: 'application/json',
@@ -58,7 +75,7 @@ var Board = React.createClass({
 var User = React.createClass({
 	loadCurrentUserFromServer: function() {
 		$.ajax({
-			headers: { 'Authorization': authToken, },
+			headers: { 'Authorization': this.props.authToken, },
 			url: apiRoot + '/me/',
 			dataType: 'json',
 			cache: false,
@@ -139,14 +156,6 @@ var PropositionForm = React.createClass({
 })
 
 ReactDOM.render(
-	<div>
-		<div id="projet" className="tabContent" >
-			<User currentUser={true} pollInterval={2000} />
-			<Board title="Débats en cours" url="/propositions/" pollInterval={2000} />
-		</div>
-		<div id="compass" className="tabContent"></div>
-		<div id="trending" className="tabContent"></div>
-	</div>,
+	<App authURL="/obtain-auth-token/" />,
 	document.getElementById('mainContent')
-);
-
+)

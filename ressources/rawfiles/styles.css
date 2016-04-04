@@ -29,6 +29,11 @@ h2 {
   font-size: 1.6em;
 }
 
+.well {
+  max-width: 20rem;
+  margin-top: 1rem;
+}
+
 .tabFrame {
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -59,6 +64,13 @@ h2 {
   display: none;
 }
 
+.brand {
+  color: #00314e;
+  font-family: 'Open Sans', sans-serif;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
 .topFrame {
   color: white;
   padding: 1rem;
@@ -76,13 +88,11 @@ h2 {
 }
 .topFrame__brand {
   display: inline;
-  text-transform: uppercase;
-  text-decoration: none;
   float: left;
   margin-top: 0;
-  color: #00314e;
-  font-family: "Open Sans", sans-serif, img;
-  font-family-height: 2em;
+}
+.topFrame__brand img {
+  height: 2em;
 }
 .topFrame__icon {
   padding: 0 .5em;
@@ -172,7 +182,7 @@ h2 {
 
 @media only screen and (min-device-width: 480px) {
   html {
-    font-size: 24px;
+    font-size: 18px;
   }
 }
 .text-center {

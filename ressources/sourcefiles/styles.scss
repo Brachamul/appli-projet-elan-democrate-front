@@ -44,6 +44,11 @@ h1, h2, h3, h4, h5, h6 { margin-top: 1em; font-family: $title-font; color: $prim
 h2 { font-size: 1.6em;  }
 
 
+// MISC
+
+.well { max-width: 20rem; margin-top: 1rem; }
+
+
 // TAB BUTTONS
 
 
@@ -81,6 +86,13 @@ h2 { font-size: 1.6em;  }
 	}
 }
 
+.brand {
+	color: $primary-color;
+	font-family: 'Open Sans', sans-serif;
+	text-transform: uppercase;
+	text-decoration: none;
+}
+
 .topFrame {
 	color: white;
 	padding: 1rem;
@@ -93,12 +105,8 @@ h2 { font-size: 1.6em;  }
 	&__brand {
 		// The brand is aligned on the left of the topFrame
 		display: inline;
-		text-transform: uppercase;
-		text-decoration: none;
 		float: left;
 		margin-top: 0;
-		color: $primary-color;
-		font-family: 'Open Sans', sans-serif,
 
 
 		// If the brand is an image instead of text
@@ -203,7 +211,7 @@ h2 { font-size: 1.6em;  }
 
 // FONT SIZES
 
-@media only screen and (min-device-width: 480px) { html { font-size : 24px; } }
+@media only screen and (min-device-width: 480px) { html { font-size : 18px; } }
 
 
 // UTILITIES

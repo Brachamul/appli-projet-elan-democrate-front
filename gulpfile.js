@@ -12,6 +12,7 @@ var gulp = require('gulp'),
 	livereload = require('gulp-livereload'),
 	del = require('del');
 	debug = require('gulp-debug');
+	babel = require('gulp-babel');
 
 gulp.task('default', ['clean'], function() {
 	gulp.start('styles', 'scripts');
@@ -37,9 +38,10 @@ gulp.task('scripts', function() {
 //		.pipe(jshint('.jshintrc'))
 //		.pipe(jshint.reporter('default'))
 		.pipe(concat('main.js'))
+        .pipe(babel({presets: ['react', 'es2015']}))
 		.pipe(gulp.dest('ressources/rawfiles/'))
 		.pipe(rename({suffix: '.min'}))
-		.pipe(uglify())
+		.pipe(uglify()).on('error', errorHandler)
 		.pipe(gulp.dest('ressources/prodfiles/'))
 		.pipe(notify({ message: 'Scripts task complete !' }));
 });	
@@ -69,3 +71,9 @@ gulp.task('webpack', function(callback) {
 		callback();
 	});
 });
+
+// Handle the error
+function errorHandler (error) {
+	console.log(error.toString());
+	this.emit('end');
+}

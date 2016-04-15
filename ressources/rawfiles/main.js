@@ -1,4 +1,8 @@
-"use strict";
+'use strict';
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
 var apiRoot = "http://localhost:8000";
 
@@ -12,23 +16,75 @@ var Button = ReactBootstrap.Button;
 var Input = ReactBootstrap.Input;
 var ButtonInput = ReactBootstrap.ButtonInput;
 
-var App = React.createClass({
-	displayName: "App",
+var LOG_IN = 'LOG_IN';
+var NEW_ALERT = 'NEW_ALERT';
+var REMOVE_ALERT = 'REMOVE_ALERT';
 
-	authenticate: function authenticate() {
-		$.ajax({
-			method: "POST",
-			url: apiRoot + this.props.authURL,
-			data: { username: "Brachamul", password: "purple14" },
-			success: function success(data) {
-				this.props.authToken = "Token " + response.token;
-				console.log(this.props.authToken);
-			},
-			error: function error(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}
-		});
-	},
+function authenticationApp() {
+	var state = arguments.length <= 0 || arguments[0] === undefined ? {
+		authToken: false,
+		username: "Guest"
+	} : arguments[0];
+	var action = arguments[1];
+
+	switch (action.type) {
+		case LOG_IN:
+			return _extends({}, state, { authToken: action.authToken });
+		default:
+			return state;
+	}
+}
+
+function alerts() {
+	var state = arguments.length <= 0 || arguments[0] === undefined ? [] : arguments[0];
+	var action = arguments[1];
+
+	switch (action.type) {
+		case NEW_ALERT:
+			return [].concat(_toConsumableArray(state), [{
+				level: action.level, // success, info, warning or danger
+				text: action.text
+			}]);
+		case REMOVE_ALERT:
+			return [].concat(_toConsumableArray(state.slice(0, action.index)), _toConsumableArray(state.slice(action.index + 1)));
+
+		// Can't use splice to avoid mutating the state
+		// Instead, concatenating the array before my object and the one after
+		default:
+			return state;
+	}
+}
+
+var potatoApp = Redux.combineReducers({ authenticationApp: authenticationApp, alerts: alerts });
+
+var store = Redux.createStore(potatoApp);
+
+store.dispatch({ type: NEW_ALERT, level: "warning", text: "This is a message!" });
+console.log(store.alerts);
+
+//	dispatch(LogIn({text: 'Asks the server for an authentication token'}))
+
+var Alerts = React.createClass({
+	displayName: 'Alerts',
+
+	render: function render() {
+		console.log(store.alerts);
+		return React.createElement(
+			Alert,
+			{ bsStyle: 'warning' },
+			React.createElement(
+				'strong',
+				null,
+				'Holy guacamole!'
+			),
+			' Best check yo self, you\'re not looking too good.'
+		);
+	}
+});
+
+var App = React.createClass({
+	displayName: 'App',
+
 	render: function render() {
 		return React.createElement(LoginPage, null);
 	}
@@ -48,21 +104,21 @@ var App = React.createClass({
 });
 
 var LoginPage = React.createClass({
-	displayName: "LoginPage",
+	displayName: 'LoginPage',
 
 	render: function render() {
 		return React.createElement(
-			"div",
-			{ className: "loginPage" },
+			'div',
+			{ className: 'loginPage' },
 			React.createElement(Header, null),
 			React.createElement(Grid, { fluid: true }),
 			React.createElement(
-				"div",
-				{ className: "container-fluid well" },
+				'div',
+				{ className: 'container-fluid well' },
 				React.createElement(
-					"div",
-					{ className: "row-fluid" },
-					React.createElement(LoginForm, { title: "Connexion", titleLevel: 1 })
+					'div',
+					{ className: 'row-fluid' },
+					React.createElement(LoginForm, { title: 'Connexion', titleLevel: 1, authURL: '/obtain-auth-token/' })
 				)
 			)
 		);
@@ -70,7 +126,27 @@ var LoginPage = React.createClass({
 });
 
 var LoginForm = React.createClass({
-	displayName: "LoginForm",
+	displayName: 'LoginForm',
+
+	authenticateWithServer: function authenticateWithServer() {
+		console.log('authenticating...');
+		console.log(apiRoot + this.props.authURL);
+	},
+	handleSubmit: function handleSubmit(e) {
+		e.preventDefault();
+		$.ajax({
+			method: "POST",
+			url: apiRoot + this.props.authURL,
+			data: { username: "Brachamul", password: "potato" },
+			success: function success(response) {
+				store.dispatch({
+					type: LOG_IN,
+					authToken: "Token " + response.token
+				});
+			},
+			error: function error(xhr, status, err) {}
+		});
+	},
 	login: function login(e) {
 		e.preventDefault();
 		// Here, we call an external AuthService. We’ll create it in the next step
@@ -79,22 +155,21 @@ var LoginForm = React.createClass({
 		});
 	},
 
-
 	render: function render() {
 		return React.createElement(
-			"form",
-			{ action: "/api-auth/login/", role: "form", method: "post" },
+			'form',
+			{ onSubmit: this.handleSubmit, role: 'form' },
 			React.createElement(Title, { title: this.props.title, titleLevel: this.props.titleLevel }),
-			React.createElement("hr", null),
-			React.createElement(Input, { name: "username", label: "Username:", type: "text", maxLength: "30", autoCapitalize: "off", autoCorrect: "off", required: true, autofocus: "" }),
-			React.createElement(Input, { name: "password", label: "Password:", type: "text", maxLength: "72", autoCapitalize: "off", autoCorrect: "off", required: true }),
-			React.createElement(ButtonInput, { type: "submit", value: "Log in", bsStyle: "primary", block: true })
+			React.createElement('hr', null),
+			React.createElement(Input, { name: 'username', label: 'Username:', type: 'text', maxLength: '30', autoCapitalize: 'off', autoCorrect: 'off', autofocus: '' }),
+			React.createElement(Input, { name: 'password', label: 'Password:', type: 'text', maxLength: '72', autoCapitalize: 'off', autoCorrect: 'off' }),
+			React.createElement(ButtonInput, { type: 'submit', value: 'Log in', bsStyle: 'primary', block: true })
 		);
 	}
 });
 
 var Title = React.createClass({
-	displayName: "Title",
+	displayName: 'Title',
 
 	propTypes: {
 		title: React.PropTypes.string,
@@ -102,32 +177,32 @@ var Title = React.createClass({
 	},
 	render: function render() {
 		if (this.props.titleLevel == 1) return React.createElement(
-			"h1",
+			'h1',
 			null,
 			this.props.title
 		);
 		if (this.props.titleLevel == 2) return React.createElement(
-			"h2",
+			'h2',
 			null,
 			this.props.title
 		);
 		if (this.props.titleLevel == 3) return React.createElement(
-			"h3",
+			'h3',
 			null,
 			this.props.title
 		);
 		if (this.props.titleLevel == 4) return React.createElement(
-			"h4",
+			'h4',
 			null,
 			this.props.title
 		);
 		if (this.props.titleLevel == 5) return React.createElement(
-			"h5",
+			'h5',
 			null,
 			this.props.title
 		);
 		if (this.props.titleLevel == 6) return React.createElement(
-			"h6",
+			'h6',
 			null,
 			this.props.title
 		);
@@ -135,48 +210,48 @@ var Title = React.createClass({
 });
 
 var Brand = React.createClass({
-	displayName: "Brand",
+	displayName: 'Brand',
 
 	render: function render() {
 		return React.createElement(
-			"div",
-			{ className: "brand" },
-			React.createElement("i", { className: "fa fa-chevron-right" }),
-			" ",
+			'div',
+			{ className: 'brand' },
+			React.createElement('i', { className: 'fa fa-chevron-right' }),
+			' ',
 			React.createElement(
-				"strong",
+				'strong',
 				null,
-				"Élan Démocrate"
+				'Élan Démocrate'
 			)
 		);
 	}
 });
 
 var Header = React.createClass({
-	displayName: "Header",
+	displayName: 'Header',
 
 	render: function render() {
 		return React.createElement(
-			"header",
+			'header',
 			null,
 			React.createElement(TopFrame, null),
 			React.createElement(
-				"nav",
-				{ className: "tabFrame" },
+				'nav',
+				{ className: 'tabFrame' },
 				React.createElement(
-					"a",
-					{ className: "tabFrame__button active", "data-target-tab": "projet" },
-					React.createElement("i", { className: "tabFrame__button__icon fa fa-file-text" })
+					'a',
+					{ className: 'tabFrame__button active', 'data-target-tab': 'projet' },
+					React.createElement('i', { className: 'tabFrame__button__icon fa fa-file-text' })
 				),
 				React.createElement(
-					"a",
-					{ className: "tabFrame__button", "data-target-tab": "compass" },
-					React.createElement("i", { className: "tabFrame__button__icon fa fa-compass" })
+					'a',
+					{ className: 'tabFrame__button', 'data-target-tab': 'compass' },
+					React.createElement('i', { className: 'tabFrame__button__icon fa fa-compass' })
 				),
 				React.createElement(
-					"a",
-					{ className: "tabFrame__button", "data-target-tab": "trending" },
-					React.createElement("i", { className: "tabFrame__button__icon fa fa-hashtag" })
+					'a',
+					{ className: 'tabFrame__button', 'data-target-tab': 'trending' },
+					React.createElement('i', { className: 'tabFrame__button__icon fa fa-hashtag' })
 				)
 			)
 		);
@@ -184,33 +259,33 @@ var Header = React.createClass({
 });
 
 var TopFrame = React.createClass({
-	displayName: "TopFrame",
+	displayName: 'TopFrame',
 
 	render: function render() {
 		return React.createElement(
-			"div",
-			{ className: "topFrame" },
+			'div',
+			{ className: 'topFrame' },
 			React.createElement(
-				"div",
-				{ className: "topFrame__brand" },
+				'div',
+				{ className: 'topFrame__brand' },
 				React.createElement(Brand, null)
 			),
 			React.createElement(
-				"a",
-				{ href: "#search", className: "topFrame__icon" },
-				React.createElement("i", { className: "fa fa-search" })
+				'a',
+				{ href: '#search', className: 'topFrame__icon' },
+				React.createElement('i', { className: 'fa fa-search' })
 			),
 			React.createElement(
-				"a",
-				{ href: "#menu", className: "topFrame__icon" },
-				React.createElement("i", { className: "fa fa-ellipsis-v" })
+				'a',
+				{ href: '#menu', className: 'topFrame__icon' },
+				React.createElement('i', { className: 'fa fa-ellipsis-v' })
 			)
 		);
 	}
 });
 
 var Board = React.createClass({
-	displayName: "Board",
+	displayName: 'Board',
 
 	loadCardsFromServer: function loadCardsFromServer() {
 		$.ajax({
@@ -244,11 +319,11 @@ var Board = React.createClass({
 			});
 		});
 		return React.createElement(
-			"div",
-			{ className: "board" },
+			'div',
+			{ className: 'board' },
 			React.createElement(
-				"h2",
-				{ className: "board__title" },
+				'h2',
+				{ className: 'board__title' },
 				this.props.title
 			),
 			cards
@@ -294,15 +369,15 @@ var Board = React.createClass({
 //	});
 
 var Card = React.createClass({
-	displayName: "Card",
+	displayName: 'Card',
 
 	render: function render() {
 		return React.createElement(
-			"article",
-			{ className: "card" },
+			'article',
+			{ className: 'card' },
 			React.createElement(
-				"h3",
-				{ className: "card__title" },
+				'h3',
+				{ className: 'card__title' },
 				this.props.title
 			)
 		);
@@ -310,66 +385,66 @@ var Card = React.createClass({
 });
 
 var TagList = React.createClass({
-	displayName: "TagList",
+	displayName: 'TagList',
 
 	render: function render() {
 		var tags = this.props.data.map(function (tag) {
 			return React.createElement(
-				"span",
-				{ className: "card__tag", slug: tag.slug, key: tag.slug },
+				'span',
+				{ className: 'card__tag', slug: tag.slug, key: tag.slug },
 				tag.text
 			);
 		});
 		return React.createElement(
-			"p",
-			{ className: "card__tags" },
+			'p',
+			{ className: 'card__tags' },
 			tags
 		);
 	}
 });
 
 var PropositionForm = React.createClass({
-	displayName: "PropositionForm",
+	displayName: 'PropositionForm',
 
 	render: function render() {
 		return React.createElement(
-			"form",
-			{ id: "get-form", className: "pull-right" },
+			'form',
+			{ id: 'get-form', className: 'pull-right' },
 			React.createElement(
-				"fieldset",
+				'fieldset',
 				null,
 				React.createElement(
-					"div",
-					{ className: "btn-group format-selection" },
+					'div',
+					{ className: 'btn-group format-selection' },
 					React.createElement(
-						"a",
-						{ className: "btn btn-primary js-tooltip", href: "/propositions/", rel: "nofollow", title: "Make a GET request on the Proposition List resource" },
-						"GET"
+						'a',
+						{ className: 'btn btn-primary js-tooltip', href: '/propositions/', rel: 'nofollow', title: 'Make a GET request on the Proposition List resource' },
+						'GET'
 					),
 					React.createElement(
-						"button",
-						{ className: "btn btn-primary dropdown-toggle js-tooltip", "data-toggle": "dropdown", title: "Specify a format for the GET request" },
-						React.createElement("span", { className: "caret" })
+						'button',
+						{ className: 'btn btn-primary dropdown-toggle js-tooltip', 'data-toggle': 'dropdown', title: 'Specify a format for the GET request' },
+						React.createElement('span', { className: 'caret' })
 					),
 					React.createElement(
-						"ul",
-						{ className: "dropdown-menu" },
+						'ul',
+						{ className: 'dropdown-menu' },
 						React.createElement(
-							"li",
+							'li',
 							null,
 							React.createElement(
-								"a",
-								{ className: "js-tooltip format-option", href: "/propositions/?format=json", rel: "nofollow", title: "Make a GET request on the Proposition List resource with the format set to `json`" },
-								"json"
+								'a',
+								{ className: 'js-tooltip format-option', href: '/propositions/?format=json', rel: 'nofollow', title: 'Make a GET request on the Proposition List resource with the format set to `json`' },
+								'json'
 							)
 						),
 						React.createElement(
-							"li",
+							'li',
 							null,
 							React.createElement(
-								"a",
-								{ className: "js-tooltip format-option", href: "/propositions/?format=api", rel: "nofollow", title: "Make a GET request on the Proposition List resource with the format set to `api`" },
-								"api"
+								'a',
+								{ className: 'js-tooltip format-option', href: '/propositions/?format=api', rel: 'nofollow', title: 'Make a GET request on the Proposition List resource with the format set to `api`' },
+								'api'
 							)
 						)
 					)
@@ -379,7 +454,7 @@ var PropositionForm = React.createClass({
 	}
 });
 
-ReactDOM.render(React.createElement(App, { authURL: "/obtain-auth-token/" }), document.getElementById('mainContent'));
+ReactDOM.render(React.createElement(App, null), document.getElementById('mainContent'));
 
 $(document).ready(function () {
 

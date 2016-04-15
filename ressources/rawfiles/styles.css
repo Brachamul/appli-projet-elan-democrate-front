@@ -29,7 +29,7 @@ h2 {
   font-size: 1.6em;
 }
 
-label {
+label, input, button {
   font-family: "Didact Gothic", sans-serif;
 }
 

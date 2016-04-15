@@ -1,34 +1,77 @@
-var apiRoot = "http://localhost:8000"
-
+const apiRoot = "http://localhost:8000"
 
 // Import Bootstrap components via the ReactBootstrap library
 //	import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput } from 'react-bootstrap'
-var Grid		= ReactBootstrap.Grid
-var Col			= ReactBootstrap.Col
-var Row			= ReactBootstrap.Row
-var Clearfix 	= ReactBootstrap.Clearfix
-var	Button		= ReactBootstrap.Button
-var Input		= ReactBootstrap.Input
-var ButtonInput	= ReactBootstrap.ButtonInput
+const Grid			= ReactBootstrap.Grid
+const Col			= ReactBootstrap.Col
+const Row			= ReactBootstrap.Row
+const Clearfix 		= ReactBootstrap.Clearfix
+const Button		= ReactBootstrap.Button
+const Input			= ReactBootstrap.Input
+const ButtonInput	= ReactBootstrap.ButtonInput
 
 
+const LOG_IN = 'LOG_IN'
+const NEW_ALERT = 'NEW_ALERT'
+const REMOVE_ALERT = 'REMOVE_ALERT'
+
+function authenticationApp(
+	state={
+		authToken: false,
+		username: "Guest"
+	}, action) {
+	switch (action.type) {
+		case LOG_IN :
+			return { ...state, authToken: action.authToken }
+		default : 
+			return state
+	}
+}
+
+function alerts(state=[], action) {
+	switch (action.type) {
+		case NEW_ALERT :
+			return [
+				...state,
+				{
+					level : action.level, // success, info, warning or danger
+					text : action.text
+				}
+			]
+		case REMOVE_ALERT :
+			return [
+				...state.slice(0, action.index),
+				...state.slice(action.index + 1)
+				// Can't use splice to avoid mutating the state
+				// Instead, concatenating the array before my object and the one after
+			]
+		default:
+			return state
+	}	
+}
 
 
-var App = React.createClass({
-	authenticate: function() {
-		$.ajax({
-			method: "POST",
-			url: apiRoot + this.props.authURL,
-			data: { username: "Brachamul", password: "purple14" },
-			success: function(data) {
-				this.props.authToken = "Token " + response.token
-				console.log(this.props.authToken)
-			},
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			},
-		})
-	},
+const potatoApp = Redux.combineReducers({ authenticationApp, alerts, })
+
+const store = Redux.createStore( potatoApp, )
+
+store.dispatch({type:NEW_ALERT, level:"warning", text:"This is a message!"})
+console.log(store.alerts)
+
+//	dispatch(LogIn({text: 'Asks the server for an authentication token'}))
+
+const Alerts = React.createClass({
+	render: function(){
+		console.log(store.alerts)
+		return(
+			<Alert bsStyle="warning">
+				<strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
+			</Alert>
+		)
+	}
+})
+
+const App = React.createClass({
 	render: function(){
 		return(
 			<LoginPage/>
@@ -49,7 +92,7 @@ var App = React.createClass({
 //		},
 })
 
-var LoginPage = React.createClass({
+const LoginPage = React.createClass({
 	render: function(){
 		return(
 			<div className="loginPage">
@@ -57,7 +100,7 @@ var LoginPage = React.createClass({
 				<Grid fluid />
 				<div className="container-fluid well" >
 					<div className="row-fluid">
-						<LoginForm title="Connexion" titleLevel={1} />
+						<LoginForm title="Connexion" titleLevel={1} authURL="/obtain-auth-token/" />
 					</div>
 				</div>
 			</div>
@@ -65,7 +108,29 @@ var LoginPage = React.createClass({
 	}
 })
 
-var LoginForm = React.createClass({
+const LoginForm = React.createClass({
+	authenticateWithServer: function() {
+		console.log('authenticating...')
+		console.log(apiRoot + this.props.authURL)
+
+	},
+	handleSubmit: function(e) {
+		e.preventDefault();
+		$.ajax({
+			method: "POST",
+			url: apiRoot + this.props.authURL,
+			data: { username: "Brachamul", password: "potato" },
+			success: function(response) {
+				store.dispatch({
+					type: LOG_IN,
+					authToken: "Token " + response.token
+				})
+			},
+			error: function(xhr, status, err) {
+
+			},
+		})
+	},
 	login(e) {
 		e.preventDefault();
 		// Here, we call an external AuthService. We’ll create it in the next step
@@ -74,21 +139,20 @@ var LoginForm = React.createClass({
 				console.log("Error logging in", err);
 			});
 	},
-
 	render: function(){
 		return(
-			<form action="/api-auth/login/" role="form" method="post" >
+			<form onSubmit={this.handleSubmit} role="form">
 				<Title title={this.props.title} titleLevel={this.props.titleLevel} />
 				<hr/>				
-				<Input name="username" label="Username:" type="text" maxLength="30" autoCapitalize="off" autoCorrect="off" required autofocus="" />
-				<Input name="password" label="Password:" type="text" maxLength="72" autoCapitalize="off" autoCorrect="off" required />
+				<Input name="username" label="Username:" type="text" maxLength="30" autoCapitalize="off" autoCorrect="off" autofocus="" />
+				<Input name="password" label="Password:" type="text" maxLength="72" autoCapitalize="off" autoCorrect="off" />
 				<ButtonInput type="submit" value="Log in" bsStyle="primary" block />
 			</form>
 		);
 	}
 })
 
-var Title = React.createClass({
+const Title = React.createClass({
 	propTypes: {
 		title: React.PropTypes.string,
 		titleLevel: React.PropTypes.number,
@@ -104,7 +168,7 @@ var Title = React.createClass({
 })
 
 
-var Brand = React.createClass({
+const Brand = React.createClass({
 	render: function(){
 		return(
 			<div className="brand">
@@ -116,7 +180,7 @@ var Brand = React.createClass({
 	}
 })
 
-var Header = React.createClass({
+const Header = React.createClass({
 	render: function(){
 		return(
 			<header>
@@ -144,7 +208,7 @@ var Header = React.createClass({
 	}
 })
 
-var TopFrame = React.createClass({
+const TopFrame = React.createClass({
 	render: function(){
 		return(
 			<div className="topFrame">
@@ -162,7 +226,7 @@ var TopFrame = React.createClass({
 	}
 })
 
-var Board = React.createClass({
+const Board = React.createClass({
 	loadCardsFromServer: function() {
 		$.ajax({
 			url: this.props.url,
@@ -243,7 +307,7 @@ var Board = React.createClass({
 //		},
 //	});
 
-var Card = React.createClass({
+const Card = React.createClass({
 	render: function() {
 		return (
 			<article className="card">
@@ -254,7 +318,7 @@ var Card = React.createClass({
 	}
 })
 
-var TagList = React.createClass({
+const TagList = React.createClass({
 	render: function() {
 		var tags = this.props.data.map(function(tag) {
 			return ( <span className="card__tag" slug={tag.slug} key={tag.slug} >{tag.text}</span> );
@@ -263,7 +327,7 @@ var TagList = React.createClass({
 	}
 })
 
-var PropositionForm = React.createClass({
+const PropositionForm = React.createClass({
 	render: function() {
 		return (
 			<form id="get-form" className="pull-right">
@@ -289,6 +353,6 @@ var PropositionForm = React.createClass({
 })
 
 ReactDOM.render(
-	<App authURL="/obtain-auth-token/" />,
+	<App/>,
 	document.getElementById('mainContent')
 )

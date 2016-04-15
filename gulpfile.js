@@ -38,10 +38,10 @@ gulp.task('scripts', function() {
 //		.pipe(jshint('.jshintrc'))
 //		.pipe(jshint.reporter('default'))
 		.pipe(concat('main.js'))
-        .pipe(babel({presets: ['react', 'es2015']}))
+        .pipe(babel({presets: ['react', 'es2015', 'stage-2']})) // added stage-2 for babel-preset-stage-2 in order to use "..."" notation in react
 		.pipe(gulp.dest('ressources/rawfiles/'))
 		.pipe(rename({suffix: '.min'}))
-		.pipe(uglify()).on('error', errorHandler)
+//		.pipe(uglify()).on('error', errorHandler) 
 		.pipe(gulp.dest('ressources/prodfiles/'))
 		.pipe(notify({ message: 'Scripts task complete !' }));
 });	

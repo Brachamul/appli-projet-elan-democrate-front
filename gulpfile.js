@@ -13,13 +13,36 @@ var gulp = require('gulp'),
 	del = require('del');
 	debug = require('gulp-debug');
 	babel = require('gulp-babel');
-
-gulp.task('default', ['clean'], function() {
-	gulp.start('styles', 'scripts');
-});
+	webpack = require('webpack-stream');
+	watch = require('gulp-watch')
+	sourcemaps = require('gulp-sourcemaps')
 
 gulp.task('clean', function() {
 	return del(['ressources/rawfiles/', 'ressources/prodfiles/']);
+});
+
+gulp.task('bundle', function() {
+	return gulp.src('ressources/sourcefiles/index.js')
+		.pipe(webpack({
+			module: {
+				loaders: [
+					{
+						test: /\.jsx?$/,
+						exclude: /(node_modules|bower_components)/,
+						loader: 'babel', // 'babel-loader' is also a legal name to reference
+						query: { presets: ['react', 'es2015', 'stage-2'], compact: false, },
+					}
+				],
+			},			
+		}))
+		.pipe(rename('bundle.js'))
+		.pipe(gulp.dest('ressources/rawfiles/')) // Output unminified bundle
+		.pipe(notify({ message: 'Bundling complete!' }))
+//		.pipe(uglify()).on('error', errorHandler) 
+		.pipe(rename({suffix: '.min'}))
+		.pipe(sourcemaps.init())
+		.pipe(sourcemaps.write('./'))
+		.pipe(gulp.dest('ressources/prodfiles/')) // Output minified bundle
 });
 
 gulp.task('styles', function() {
@@ -30,47 +53,27 @@ gulp.task('styles', function() {
 		.pipe(rename({suffix: '.min'}))
 		.pipe(cssnano())
 		.pipe(gulp.dest('ressources/prodfiles/'))
-		.pipe(notify({ message: 'Styles task complete !' }));
 });
 
-gulp.task('scripts', function() {
-	return gulp.src('ressources/sourcefiles/*.js')
-//		.pipe(jshint('.jshintrc'))
-//		.pipe(jshint.reporter('default'))
-		.pipe(concat('main.js'))
-        .pipe(babel({presets: ['react', 'es2015', 'stage-2']})) // added stage-2 for babel-preset-stage-2 in order to use "..."" notation in react
-		.pipe(gulp.dest('ressources/rawfiles/'))
-		.pipe(rename({suffix: '.min'}))
-//		.pipe(uglify()).on('error', errorHandler) 
-		.pipe(gulp.dest('ressources/prodfiles/'))
-		.pipe(notify({ message: 'Scripts task complete !' }));
-});	
+//	gulp.task('scripts', function() {
+//		return gulp.src('ressources/rawfiles/bundle.js')
+//	//		.pipe(jshint('.jshintrc'))
+//	//		.pipe(jshint.reporter('default'))
+//	//		.pipe(concat('main.js'))
+//			.pipe(babel({presets: ['react', 'es2015', 'stage-2']})) // added stage-2 for babel-preset-stage-2 in order to use "..."" notation in react
+//	//		.pipe(gulp.dest('ressources/rawfiles/'))
+//			.pipe(rename({suffix: '.min'}))
+//	//		.pipe(uglify()).on('error', errorHandler) 
+//			.pipe(gulp.dest('ressources/prodfiles/'))
+//	});	
 
-gulp.task('watch', function() {
 
-	// Watch .scss files
-	gulp.watch('ressources/sourcefiles/*.scss', ['styles']);
-
-	// Watch .js files
-	gulp.watch('ressources/sourcefiles/*.js', ['scripts']);
-
-	// Watch image files
-//	gulp.watch('src/images/**/*', ['images']);
-
-});
-
-gulp.task('webpack', function(callback) {
-	// run webpack
-	webpack({
-		// configuration
-	}, function(err, stats) {
-		if(err) throw new gutil.PluginError("webpack", err);
-		gutil.log("[webpack]", stats.toString({
-			// output options
-		}));
-		callback();
-	});
-});
+gulp.task('default',
+	gulp.series(
+		'clean',
+		gulp.parallel('bundle', 'styles')
+	)
+)
 
 // Handle the error
 function errorHandler (error) {

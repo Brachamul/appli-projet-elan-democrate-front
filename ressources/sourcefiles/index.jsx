@@ -1,65 +1,24 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore, combineReducers } from 'redux'
-//	import todoApp from './reducers'
+import { createStore } from 'redux'
+import rootApp from './reducers'
 //	import App from './components/App'
 import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, } from 'react-bootstrap'
 
 
 // to remove
-const potatoApp = combineReducers({ authenticationApp, alerts, })
 
-let store = createStore( potatoApp, )
+let store = createStore( rootApp, )
 
 
 const apiRoot = "http://localhost:8000"
 
-const LOG_IN = 'LOG_IN'
-const NEW_ALERT = 'NEW_ALERT'
-const REMOVE_ALERT = 'REMOVE_ALERT'
-
-function authenticationApp(
-	state={
-		authToken: false,
-		username: "Guest"
-	}, action) {
-	switch (action.type) {
-		case LOG_IN :
-			return { ...state, authToken: action.authToken }
-		default : 
-			return state
-	}
-}
-
-function alerts(state=[], action) {
-	switch (action.type) {
-		case NEW_ALERT :
-			return [
-				...state,
-				{
-					level : action.level, // success, info, warning or danger
-					text : action.text
-				}
-			]
-		case REMOVE_ALERT :
-			return [
-				...state.slice(0, action.index),
-				...state.slice(action.index + 1)
-				// Can't use splice to avoid mutating the state
-				// Instead, concatenating the array before my object and the one after
-			]
-		default:
-			return state
-	}	
-}
 
 
 
 
-
-
-store.dispatch({type:NEW_ALERT, level:"warning", text:"This is a message!"})
+//	store.dispatch({type:NEW_ALERT, level:"warning", text:"This is a message!"})
 
 //	dispatch(LogIn({text: 'Asks the server for an authentication token'}))
 

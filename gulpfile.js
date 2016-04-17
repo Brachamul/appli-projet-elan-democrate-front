@@ -22,7 +22,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('bundle', function() {
-	return gulp.src('ressources/sourcefiles/index.js')
+	return gulp.src('ressources/sourcefiles/index.jsx')
 		.pipe(webpack({
 			module: {
 				loaders: [

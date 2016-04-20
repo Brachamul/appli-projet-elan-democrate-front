@@ -1,6 +1,6 @@
-function alerts(state=[], action) {
+function alerts(state=[{level: 'warning', text:'<p>Warning message!</p>'}], action) {
 	switch (action.type) {
-		case NEW_ALERT :
+		case 'NEW_ALERT' :
 			return [
 				...state,
 				{
@@ -8,7 +8,7 @@ function alerts(state=[], action) {
 					text : action.text
 				}
 			]
-		case REMOVE_ALERT :
+		case 'DISMISS_ALERT' :
 			return [
 				...state.slice(0, action.index),
 				...state.slice(action.index + 1)

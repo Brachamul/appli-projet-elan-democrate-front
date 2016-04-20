@@ -1,7 +1,6 @@
-export const logIn = (username, password) => {
+export const authenticate = (authToken) => {
 	return {
-		type: 'LOG_IN',
-		username,  // success, info, warning or danger
-		password,
+		type: 'AUTHENTICATE',
+		authToken
 	}
 }

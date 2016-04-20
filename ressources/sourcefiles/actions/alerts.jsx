@@ -6,9 +6,9 @@ export const newAlert = (level, text) => {
 	}
 }
 
-export const removeAlert = (index) => {
+export const onDismiss = (index) => {
 	return {
-		type: 'REMOVE_ALERT',
+		type: 'DISMISS_ALERT',
 		index,
 	}
 }

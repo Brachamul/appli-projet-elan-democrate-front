@@ -37,6 +37,10 @@ code {
   font-family: "Courier New", sans-serif;
 }
 
+a {
+  color: inherit;
+}
+
 .well {
   max-width: 20rem;
   margin-top: 1rem;

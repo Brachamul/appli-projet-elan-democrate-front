@@ -17,9 +17,14 @@ var gulp = require('gulp'),
 	watch = require('gulp-watch')
 	sourcemaps = require('gulp-sourcemaps')
 
-gulp.task('clean', function() {
-	return del(['ressources/rawfiles/', 'ressources/prodfiles/']);
+gulp.task('cleanJS', function() {
+	return del(['ressources/rawfiles/**.js*', 'ressources/prodfiles/**.js*']);
 });
+
+gulp.task('cleanCSS', function() {
+	return del(['ressources/rawfiles/**.css', 'ressources/prodfiles/**.css']);
+});
+
 
 gulp.task('bundle', function() {
 	return gulp.src('ressources/sourcefiles/index.jsx')
@@ -28,12 +33,17 @@ gulp.task('bundle', function() {
 				loaders: [
 					{
 						test: /\.jsx?$/,
-						exclude: /(node_modules|bower_components)/,
+						exclude: /node_modules/,
 						loader: 'babel', // 'babel-loader' is also a legal name to reference
 						query: { presets: ['react', 'es2015', 'stage-2'], compact: false, },
 					}
 				],
 			},			
+			resolve: {
+				extensions: ['', '.js', '.jsx'],
+			},
+            devtool: "#eval",
+            watch: true,
 		}))
 		.pipe(rename('bundle.js'))
 		.pipe(gulp.dest('ressources/rawfiles/')) // Output unminified bundle
@@ -69,11 +79,18 @@ gulp.task('styles', function() {
 
 
 gulp.task('default',
-	gulp.series(
-		'clean',
-		gulp.parallel('bundle', 'styles')
+	gulp.parallel(
+		gulp.series('cleanCSS', 'styles'),
+		gulp.series('cleanJS', 'bundle')
 	)
 )
+
+gulp.task('watch', function() {
+	gulp.watch('ressources/sourcefiles/**.scss', gulp.series('cleanCSS', 'styles'))
+	gulp.watch('ressources/sourcefiles/**.js*', gulp.series('cleanJS', 'bundle'))
+})
+
+
 
 // Handle the error
 function errorHandler (error) {

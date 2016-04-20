@@ -1,10 +1,10 @@
 function auth(
 	state={
 		authToken: false,
-		username: "Guest"
+		username: "Guest" // gotta update this yeah ?
 	}, action) {
 	switch (action.type) {
-		case LOG_IN :
+		case 'AUTHENTICATE' :
 			return { ...state, authToken: action.authToken }
 		default : 
 			return state

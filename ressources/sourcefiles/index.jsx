@@ -2,191 +2,19 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore } from 'redux'
-import rootApp from './reducers'
+import rootAppReducers from './reducers'
+
 //	import App from './components/App'
-import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, } from 'react-bootstrap'
+import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, Alert, } from 'react-bootstrap'
 
 
 // to remove
 
-let store = createStore( rootApp, )
+let store = createStore( rootAppReducers, )
 
-
-const apiRoot = "http://localhost:8000"
-
-
-
-
-
-//	store.dispatch({type:NEW_ALERT, level:"warning", text:"This is a message!"})
+window.apiRoot = 'http://localhost:8000'
 
 //	dispatch(LogIn({text: 'Asks the server for an authentication token'}))
-
-const Alerts = React.createClass({
-	render: function(){
-		console.log(store.alerts)
-		return(
-			<Alert bsStyle="warning">
-				<strong>Holy guacamole!</strong> Best check yo self, you're not looking too good.
-			</Alert>
-		)
-	}
-})
-
-const App = React.createClass({
-	render: function(){
-		return(
-			<LoginPage/>
-		);
-	}
-//		render: function(){
-//			return(
-//				<div id="app">
-//					<Header />
-//					<div id="projet" className="tabContent" >
-//	{/*					<User authToken={this.props.authToken} currentUser={true} pollInterval={2000} /> */}
-//						<Board title="Débats en cours" url={apiRoot + "/propositions/"} pollInterval={2000} />
-//					</div>
-//					<div id="compass" className="tabContent"></div>
-//					<div id="trending" className="tabContent"></div>
-//				</div>
-//			);
-//		},
-})
-
-const LoginPage = React.createClass({
-	render: function(){
-		return(
-			<div className="loginPage">
-				<Header/>
-				<Grid fluid />
-				<div className="container-fluid well" >
-					<div className="row-fluid">
-						<LoginForm title="Connexion" titleLevel={1} authURL="/obtain-auth-token/" />
-					</div>
-				</div>
-			</div>
-		);
-	}
-})
-
-const LoginForm = React.createClass({
-	authenticateWithServer: function() {
-		console.log('authenticating...')
-		console.log(apiRoot + this.props.authURL)
-
-	},
-	handleSubmit: function(e) {
-		e.preventDefault();
-		$.ajax({
-			method: "POST",
-			url: apiRoot + this.props.authURL,
-			data: { username: "Brachamul", password: "potato" },
-			success: function(response) {
-				store.dispatch({
-					type: LOG_IN,
-					authToken: "Token " + response.token
-				})
-			},
-			error: function(xhr, status, err) {
-
-			},
-		})
-	},
-	login(e) {
-		e.preventDefault();
-		// Here, we call an external AuthService. We’ll create it in the next step
-		Auth.login(this.state.user, this.state.password)
-			.catch(function(err) {
-				console.log("Error logging in", err);
-			});
-	},
-	render: function(){
-		return(
-			<form onSubmit={this.handleSubmit} role="form">
-				<Title title={this.props.title} titleLevel={this.props.titleLevel} />
-				<hr/>				
-				<Input name="username" label="Username:" type="text" maxLength="30" autoCapitalize="off" autoCorrect="off" autofocus="" />
-				<Input name="password" label="Password:" type="text" maxLength="72" autoCapitalize="off" autoCorrect="off" />
-				<ButtonInput type="submit" value="Log in" bsStyle="primary" block />
-			</form>
-		);
-	}
-})
-
-const Title = React.createClass({
-//	propTypes: {
-//		title: PropTypes.string,
-//		titleLevel: PropTypes.number,
-//	},
-	render: function(){
-		if (this.props.titleLevel == 1) return(<h1>{this.props.title}</h1>)
-		if (this.props.titleLevel == 2) return(<h2>{this.props.title}</h2>)
-		if (this.props.titleLevel == 3) return(<h3>{this.props.title}</h3>)
-		if (this.props.titleLevel == 4) return(<h4>{this.props.title}</h4>)
-		if (this.props.titleLevel == 5) return(<h5>{this.props.title}</h5>)
-		if (this.props.titleLevel == 6) return(<h6>{this.props.title}</h6>)
-	}
-})
-
-
-const Brand = React.createClass({
-	render: function(){
-		return(
-			<div className="brand">
-				<i className="fa fa-chevron-right"></i>
-				&nbsp;
-				<strong>Élan Démocrate</strong>
-			</div>
-		)
-	}
-})
-
-const Header = React.createClass({
-	render: function(){
-		return(
-			<header>
-			
-				<TopFrame/>
-
-				<nav className="tabFrame">
-				
-					<a className="tabFrame__button active" data-target-tab="projet">
-						<i className="tabFrame__button__icon fa fa-file-text"></i>
-					</a>
-					
-					<a className="tabFrame__button" data-target-tab="compass">
-						<i className="tabFrame__button__icon fa fa-compass"></i>
-					</a>
-					
-					<a className="tabFrame__button" data-target-tab="trending">
-						<i className="tabFrame__button__icon fa fa-hashtag"></i>
-					</a>
-				
-				</nav>
-			
-			</header>
-		);
-	}
-})
-
-const TopFrame = React.createClass({
-	render: function(){
-		return(
-			<div className="topFrame">
-				<div className="topFrame__brand">
-					<Brand/>
-				</div>
-				<a href="#search" className="topFrame__icon">
-					<i className="fa fa-search"></i>
-				</a>
-				<a href="#menu" className="topFrame__icon">
-					<i className="fa fa-ellipsis-v"></i>
-				</a>
-			</div>
-		)
-	}
-})
 
 const Board = React.createClass({
 	loadCardsFromServer: function() {
@@ -314,4 +142,8 @@ const PropositionForm = React.createClass({
 	}
 })
 
-ReactDOM.render(<Provider store={store}><App/></Provider>, document.getElementById('root'))
+
+import RootAppComponent from './components'
+ReactDOM.render(<Provider store={store}><RootAppComponent/></Provider>, document.getElementById('root'))
+
+window.theStore = store

@@ -1,4 +1,4 @@
-function alerts(state=[{level: 'warning', text:'<p>Warning message!</p>'}], action) {
+function alerts(state=[], action) {
 	switch (action.type) {
 		case 'NEW_ALERT' :
 			return [

@@ -5,7 +5,7 @@ import { createStore } from 'redux'
 import rootAppReducers from './reducers'
 
 //	import App from './components/App'
-import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, Alert, } from 'react-bootstrap'
+//	import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, Alert, } from 'react-bootstrap'
 
 
 // to remove
@@ -146,4 +146,4 @@ const PropositionForm = React.createClass({
 import RootAppComponent from './components'
 ReactDOM.render(<Provider store={store}><RootAppComponent/></Provider>, document.getElementById('root'))
 
-window.theStore = store
+window.store = store

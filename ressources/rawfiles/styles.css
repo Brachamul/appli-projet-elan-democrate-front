@@ -42,8 +42,8 @@ a {
 }
 
 .well {
-  max-width: 20rem;
-  margin-top: 1rem;
+  max-width: 24rem;
+  margin: 1rem auto;
 }
 
 .tabFrame {
@@ -83,14 +83,15 @@ a {
   text-decoration: none;
 }
 
-.topFrame {
+.metaFrame {
+  color: white;
+  text-align: right;
   color: white;
   padding: 1rem;
-  text-align: right;
   font-size: 1.2em;
   background-color: #faffff;
 }
-.topFrame:after {
+.metaFrame:after {
   visibility: hidden;
   display: block;
   font-size: 0;
@@ -98,21 +99,21 @@ a {
   clear: both;
   height: 0;
 }
-.topFrame__brand {
+.metaFrame__brand {
   display: inline;
   float: left;
   margin-top: 0;
 }
-.topFrame__brand img {
+.metaFrame__brand img {
   height: 2em;
 }
-.topFrame__icon {
+.metaFrame__icon {
   padding: 0 .5em;
   display: inline-block;
   color: rgba(0, 31, 50, 0.4);
   transition: color .5s;
 }
-.topFrame__icon:hover {
+.metaFrame__icon:hover {
   color: rgba(0, 46, 74, 0.775);
   cursor: pointer;
 }

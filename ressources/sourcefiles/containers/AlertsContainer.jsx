@@ -1,24 +1,16 @@
 import { connect } from 'react-redux'
-import { Alert, } from 'react-bootstrap'
+import Alerts from '../components/Alerts'
 import { onDismiss } from '../actions/alerts'
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
 	return {
-		alerts: state.alertsState.alerts
-	}
-}
-
-const mapDispatchToProps = (dispatch, ownProps) => {
-	return {
-		onDismiss: (index) => {
-			dispatch(onDismiss(index))
-		}
+		alerts: state.alertsState
 	}
 }
 
 const AlertsContainer = connect(
 	mapStateToProps,
-	mapDispatchToProps
+	{onDismiss}
 )(Alerts)
 
 export default AlertsContainer

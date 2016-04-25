@@ -10,13 +10,13 @@ const Header = () => (
 
 const MetaFrame = () => (
 	<div className="metaFrame">
-		<div className="topFrame__brand">
+		<div className="metaFrame__brand">
 			<Brand/>
 		</div>
-		<a href="#search" className="topFrame__icon">
+		<a href="#search" className="metaFrame__icon">
 			<i className="fa fa-search"></i>
 		</a>
-		<a href="#menu" className="topFrame__icon">
+		<a href="#menu" className="metaFrame__icon">
 			<i className="fa fa-ellipsis-v"></i>
 		</a>
 	</div>

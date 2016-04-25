@@ -1,16 +1,14 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
-import { createStore } from 'redux'
+import { createStore, applyMiddleware } from 'redux'
+import thunk from 'redux-thunk';
 import rootAppReducers from './reducers'
 
 //	import App from './components/App'
 //	import { Grid, Col, Row, Clearfix, Button, Input, ButtonInput, Alert, } from 'react-bootstrap'
 
-
-// to remove
-
-let store = createStore( rootAppReducers, )
+let store = createStore( rootAppReducers, applyMiddleware(thunk) )
 
 window.apiRoot = 'http://localhost:8000'
 
@@ -58,44 +56,6 @@ const Board = React.createClass({
 		);
 	}
 });
-
-
-//	var User = React.createClass({
-//		loadCurrentUserFromServer: function() {
-//			$.ajax({
-//				headers: { 'Authorization': this.props.authToken, },
-//				url: apiRoot + '/me/',
-//				dataType: 'json',
-//				cache: false,
-//				mimetype: 'application/json',
-//				success: function(data) {
-//					this.setState({data: data});
-//				}.bind(this),
-//				error: function(xhr, status, err) {
-//					console.error( apiRoot + '/me/', status, err.toString());
-//				}.bind(this)
-//			});
-//		},
-//		getInitialState: function() {
-//			return {data: {"username": "Potato"} };
-//		},
-//		componentDidMount: function() {
-//	//		this.loadCurrentUserFromServer();
-//	//		setInterval(this.loadCurrentUserFromServer, 2000);
-//		},
-//		render: function() {
-//			var user = this.state.data
-//			return (
-//				<div className="user">
-//					<h2 className="user__username">{user.username}</h2>
-//				</div>
-//			);
-//		},
-//		propTypes: {
-//			currentUser: PropTypes.bool,
-//			userName: PropTypes.string,
-//		},
-//	});
 
 const Card = React.createClass({
 	render: function() {
